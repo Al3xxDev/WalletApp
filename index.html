@@ -7,9 +7,6 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
     <title>Wallet</title>
-    <link rel="manifest" href="manifest.json" />
-    <meta name="theme-color" content="#09090b" />
-    <link rel="apple-touch-icon" href="icon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -67,7 +64,7 @@
         margin: 0 auto;
         padding: 15px 20px;
         display: flex;
-        justify-content: space-between; /* Spinge Titolo a Sx e Lingua a Dx */
+        justify-content: space-between;
         align-items: center;
       }
 
@@ -78,26 +75,28 @@
         letter-spacing: -0.5px;
       }
 
-      /* MODIFICA: Specifiche per il selettore lingua */
-      .lang-select {
+      /* NUOVO BOTTONE LINGUA CUSTOM (Sostituisce il Select) */
+      .lang-btn {
         background: rgba(255, 255, 255, 0.1);
-        border: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: white;
-        padding: 6px 12px; /* Un po' più di spazio ai lati */
-        border-radius: 8px;
+        padding: 6px 14px;
+        border-radius: 20px; /* Arrotondato a pillola */
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        outline: none;
-
-        /* FIX CRITICO: Impedisce che erediti width: 100% */
-        width: auto !important;
-        min-width: 70px;
-        text-align: center;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Inter", sans-serif;
       }
-      .lang-select option {
-        background: #000;
-        color: white;
+      .lang-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.02);
+      }
+      .lang-btn:active {
+        transform: scale(0.95);
       }
 
       /* MAIN CONTAINER */
@@ -190,7 +189,6 @@
         text-transform: uppercase;
       }
 
-      /* Qui c'era il problema: questo width: 100% colpiva tutti i select */
       input,
       select {
         width: 100%;
@@ -229,13 +227,43 @@
         transform: scale(0.97);
       }
 
+      /* SEARCH BAR STYLE */
+      .search-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+      }
+      .search-wrapper svg {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: var(--text-secondary);
+      }
+      .search-input {
+        padding-left: 42px; /* Spazio per l'icona */
+        background-color: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+      .search-input:focus {
+        background-color: var(--bg-input);
+      }
+
       /* LISTA */
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 15px;
+      }
       .section-title {
         font-size: 14px;
         color: var(--text-secondary);
-        margin-bottom: 15px;
         font-weight: 600;
+        margin: 0;
       }
+
       .transaction-list {
         list-style: none;
         padding: 0;
@@ -312,14 +340,9 @@
     <div class="app-header">
       <div class="header-content">
         <h1 data-i18n="appTitle">My Wallet</h1>
-        <select
-          class="lang-select"
-          id="langSelector"
-          onchange="changeLanguage(this.value)"
-        >
-          <option value="it">🇮🇹 IT</option>
-          <option value="en">🇺🇸 EN</option>
-        </select>
+        <button class="lang-btn" id="langBtn" onclick="toggleLanguage()">
+          🇮🇹 IT
+        </button>
       </div>
     </div>
 
@@ -433,7 +456,33 @@
         </button>
       </div>
 
-      <div class="section-title" data-i18n="historyTitle">Attività Recente</div>
+      <div class="section-header">
+        <div class="section-title" data-i18n="historyTitle">
+          Attività Recente
+        </div>
+      </div>
+
+      <div class="search-wrapper">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          data-placeholder="searchPlaceholder"
+          oninput="updateDOM()"
+        />
+      </div>
+
       <ul id="list" class="transaction-list"></ul>
     </div>
 
@@ -455,7 +504,8 @@
           btnSave: "Salva Modifica",
           btnCancel: "Annulla Modifica",
           historyTitle: "Attività Recente",
-          noTrans: "Nessuna transazione ancora.",
+          searchPlaceholder: "Cerca transazioni...",
+          noTrans: "Nessuna transazione trovata.",
           alertMissing: "Inserisci descrizione e importo",
           confirmDelete: "Eliminare definitivamente?",
         },
@@ -475,7 +525,8 @@
           btnSave: "Save Changes",
           btnCancel: "Cancel Edit",
           historyTitle: "Recent Activity",
-          noTrans: "No transactions yet.",
+          searchPlaceholder: "Search transactions...",
+          noTrans: "No transactions found.",
           alertMissing: "Please enter description and amount",
           confirmDelete: "Delete permanently?",
         },
@@ -498,20 +549,37 @@
           const key = el.getAttribute("data-placeholder");
           if (t[key]) el.placeholder = t[key];
         });
+
         const btnKey = editIndex >= 0 ? "btnSave" : "btnAdd";
         document.getElementById("save-btn").innerText = t[btnKey];
-        document.getElementById("langSelector").value = currentLang;
+
+        // AGGIORNA BOTTONE LINGUA
+        const langBtn = document.getElementById("langBtn");
+        if (currentLang === "it") {
+          langBtn.innerText = "🇮🇹 IT";
+        } else {
+          langBtn.innerText = "🇺🇸 EN";
+        }
+
         updateDOM();
       }
 
-      function changeLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem("wallet_lang", lang);
+      // Funzione semplificata per cambiare lingua col tasto
+      function toggleLanguage() {
+        if (currentLang === "it") {
+          currentLang = "en";
+        } else {
+          currentLang = "it";
+        }
+        localStorage.setItem("wallet_lang", currentLang);
         applyLanguage();
       }
 
       function updateDOM() {
         const list = document.getElementById("list");
+        const searchQuery = document
+          .getElementById("search-input")
+          .value.toLowerCase();
         list.innerHTML = "";
 
         const sorted = transactions
@@ -522,11 +590,19 @@
             return dateB - dateA || b.originalIndex - a.originalIndex;
           });
 
-        if (sorted.length === 0) {
+        const filtered = sorted.filter((t) => {
+          return (
+            t.desc.toLowerCase().includes(searchQuery) ||
+            t.amount.toString().includes(searchQuery) ||
+            t.date.includes(searchQuery)
+          );
+        });
+
+        if (filtered.length === 0) {
           list.innerHTML = `<li style="text-align:center; color:#555; padding:20px; font-size:14px;">${translations[currentLang].noTrans}</li>`;
         }
 
-        sorted.forEach((t) => {
+        filtered.forEach((t) => {
           const val = parseFloat(t.amount);
           const isIncome = t.type === "income";
 
@@ -606,6 +682,7 @@
         }
 
         resetForm();
+        document.getElementById("search-input").value = "";
         updateDOM();
       }
 
@@ -660,13 +737,6 @@
 
       document.getElementById("date").valueAsDate = new Date();
       applyLanguage();
-    </script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("sw.js")
-          .then(() => console.log("App installabile pronta!"));
-      }
     </script>
   </body>
 </html>
