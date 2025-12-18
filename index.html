@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Wallet</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#09090b" />
+    <link rel="apple-touch-icon" href="icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg-body: #09090b;
+        --bg-card: #18181b;
+        --bg-input: #27272a;
+        --border-color: #3f3f46;
+        --text-primary: #f4f4f5;
+        --text-secondary: #a1a1aa;
+        --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        --accent-color: #3b82f6;
+        --success-color: #22c55e;
+        --danger-color: #ef4444;
+        --radius-xl: 24px;
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --app-width: 480px;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 0;
+        padding-bottom: 80px;
+      }
+
+      /* HEADER */
+      .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(9, 9, 11, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        width: 100%;
+      }
+
+      .header-content {
+        max-width: var(--app-width);
+        margin: 0 auto;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between; /* Spinge Titolo a Sx e Lingua a Dx */
+        align-items: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.5px;
+      }
+
+      /* MODIFICA: Specifiche per il selettore lingua */
+      .lang-select {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        padding: 6px 12px; /* Un po' più di spazio ai lati */
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        outline: none;
+
+        /* FIX CRITICO: Impedisce che erediti width: 100% */
+        width: auto !important;
+        min-width: 70px;
+        text-align: center;
+      }
+      .lang-select option {
+        background: #000;
+        color: white;
+      }
+
+      /* MAIN CONTAINER */
+      .container {
+        max-width: var(--app-width);
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* BALANCE CARD */
+      .balance-card {
+        background: var(--accent-gradient);
+        border-radius: var(--radius-xl);
+        padding: 25px;
+        color: white;
+        box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.5);
+        margin-bottom: 30px;
+        position: relative;
+        overflow: hidden;
+      }
+      .balance-card::after {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .balance-label {
+        font-size: 13px;
+        opacity: 0.8;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .balance-amount {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 38px;
+        font-weight: 700;
+        margin: 8px 0 20px 0;
+        letter-spacing: -1px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .stat-box {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: var(--radius-md);
+        padding: 12px;
+      }
+      .stat-val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 15px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      /* FORM */
+      .form-section {
+        background-color: var(--bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: var(--radius-xl);
+        padding: 20px;
+        margin-bottom: 30px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .input-group {
+        flex: 1;
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      /* Qui c'era il problema: questo width: 100% colpiva tutti i select */
+      input,
+      select {
+        width: 100%;
+        background-color: var(--bg-input);
+        border: 1px solid transparent;
+        color: white;
+        padding: 14px;
+        border-radius: var(--radius-md);
+        font-size: 15px;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: all 0.2s ease;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+      input:focus,
+      select:focus {
+        background-color: var(--bg-body);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      }
+
+      .btn-main {
+        width: 100%;
+        background-color: white;
+        color: black;
+        border: none;
+        padding: 16px;
+        border-radius: var(--radius-md);
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.1s;
+      }
+      .btn-main:active {
+        transform: scale(0.97);
+      }
+
+      /* LISTA */
+      .section-title {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+      .transaction-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .t-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--bg-card);
+        padding: 16px;
+        margin-bottom: 8px;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        transition: background 0.2s;
+      }
+      .t-left {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .t-desc {
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text-primary);
+      }
+      .t-date {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .t-right {
+        text-align: right;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .t-amount {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+        font-size: 15px;
+      }
+
+      .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+      }
+      .btn-icon:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      .btn-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2;
+      }
+
+      body.editing-mode .btn-main {
+        background-color: var(--success-color);
+        color: white;
+      }
+      body.editing-mode .form-section {
+        border-color: var(--success-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-header">
+      <div class="header-content">
+        <h1 data-i18n="appTitle">My Wallet</h1>
+        <select
+          class="lang-select"
+          id="langSelector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="it">🇮🇹 IT</option>
+          <option value="en">🇺🇸 EN</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="balance-card">
+        <div class="balance-label" data-i18n="balanceLabel">Saldo Totale</div>
+        <div class="balance-amount" id="balance">€0.00</div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div
+              class="balance-label"
+              data-i18n="incomeLabel"
+              style="font-size: 10px; margin-bottom: 4px"
+            >
+              Entrate
+            </div>
+            <div class="stat-val" style="color: #86efac">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <path d="M12 19V5M5 12l7-7 7 7" />
+              </svg>
+              <span id="income">0.00</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <div
+              class="balance-label"
+              data-i18n="expenseLabel"
+              style="font-size: 10px; margin-bottom: 4px"
+            >
+              Uscite
+            </div>
+            <div class="stat-val" style="color: #fca5a5">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="3"
+              >
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+              <span id="expense">0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section" id="form-card">
+        <div class="input-row">
+          <div class="input-group">
+            <label data-i18n="dateLabel">Data</label>
+            <input type="date" id="date" />
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label data-i18n="descLabel">Descrizione</label>
+            <input type="text" id="desc" data-placeholder="descPlaceholder" />
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="input-group" style="flex: 1.5">
+            <label data-i18n="amountLabel">Importo</label>
+            <input type="number" id="amount" placeholder="0.00" step="0.01" />
+          </div>
+          <div class="input-group" style="flex: 1">
+            <label data-i18n="typeLabel">Tipo</label>
+            <select id="type">
+              <option value="expense" data-i18n="optExpense">Uscita</option>
+              <option value="income" data-i18n="optIncome">Entrata</option>
+            </select>
+          </div>
+        </div>
+
+        <button
+          class="btn-main"
+          id="save-btn"
+          onclick="saveTransaction()"
+          data-i18n="btnAdd"
+        >
+          Aggiungi
+        </button>
+        <button
+          id="cancel-btn"
+          onclick="resetForm()"
+          style="
+            display: none;
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+          "
+          data-i18n="btnCancel"
+        >
+          Annulla
+        </button>
+      </div>
+
+      <div class="section-title" data-i18n="historyTitle">Attività Recente</div>
+      <ul id="list" class="transaction-list"></ul>
+    </div>
+
+    <script>
+      const translations = {
+        it: {
+          appTitle: "Il mio Wallet",
+          balanceLabel: "Saldo Totale",
+          incomeLabel: "Entrate",
+          expenseLabel: "Uscite",
+          dateLabel: "Data",
+          descLabel: "Descrizione",
+          descPlaceholder: "Netflix, Spesa, Stipendio...",
+          amountLabel: "Importo",
+          typeLabel: "Tipo",
+          optExpense: "Uscita",
+          optIncome: "Entrata",
+          btnAdd: "Aggiungi",
+          btnSave: "Salva Modifica",
+          btnCancel: "Annulla Modifica",
+          historyTitle: "Attività Recente",
+          noTrans: "Nessuna transazione ancora.",
+          alertMissing: "Inserisci descrizione e importo",
+          confirmDelete: "Eliminare definitivamente?",
+        },
+        en: {
+          appTitle: "My Wallet",
+          balanceLabel: "Total Balance",
+          incomeLabel: "Income",
+          expenseLabel: "Expenses",
+          dateLabel: "Date",
+          descLabel: "Description",
+          descPlaceholder: "Netflix, Groceries, Salary...",
+          amountLabel: "Amount",
+          typeLabel: "Type",
+          optExpense: "Expense",
+          optIncome: "Income",
+          btnAdd: "Add Transaction",
+          btnSave: "Save Changes",
+          btnCancel: "Cancel Edit",
+          historyTitle: "Recent Activity",
+          noTrans: "No transactions yet.",
+          alertMissing: "Please enter description and amount",
+          confirmDelete: "Delete permanently?",
+        },
+      };
+
+      const iconEdit = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+      const iconTrash = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      let editIndex = -1;
+      let currentLang = localStorage.getItem("wallet_lang") || "it";
+
+      function applyLanguage() {
+        const t = translations[currentLang];
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (t[key]) el.innerText = t[key];
+        });
+        document.querySelectorAll("[data-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-placeholder");
+          if (t[key]) el.placeholder = t[key];
+        });
+        const btnKey = editIndex >= 0 ? "btnSave" : "btnAdd";
+        document.getElementById("save-btn").innerText = t[btnKey];
+        document.getElementById("langSelector").value = currentLang;
+        updateDOM();
+      }
+
+      function changeLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem("wallet_lang", lang);
+        applyLanguage();
+      }
+
+      function updateDOM() {
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+
+        const sorted = transactions
+          .map((t, i) => ({ ...t, originalIndex: i }))
+          .sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateB - dateA || b.originalIndex - a.originalIndex;
+          });
+
+        if (sorted.length === 0) {
+          list.innerHTML = `<li style="text-align:center; color:#555; padding:20px; font-size:14px;">${translations[currentLang].noTrans}</li>`;
+        }
+
+        sorted.forEach((t) => {
+          const val = parseFloat(t.amount);
+          const isIncome = t.type === "income";
+
+          const li = document.createElement("li");
+          li.classList.add("t-item");
+
+          li.innerHTML = `
+                    <div class="t-left">
+                        <span class="t-desc">${t.desc}</span>
+                        <span class="t-date">${formatDate(t.date)}</span>
+                    </div>
+                    <div class="t-right">
+                        <span class="t-amount" style="color: ${
+                          isIncome ? "var(--success-color)" : "white"
+                        }">
+                            ${isIncome ? "+" : "-"}€${val.toFixed(2)}
+                        </span>
+                        <div style="display:flex; gap:2px;">
+                            <button class="btn-icon" onclick="loadForEdit(${
+                              t.originalIndex
+                            })">${iconEdit}</button>
+                            <button class="btn-icon" onclick="removeTransaction(${
+                              t.originalIndex
+                            })">${iconTrash}</button>
+                        </div>
+                    </div>
+                `;
+          list.appendChild(li);
+        });
+
+        recalcTotals();
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+      }
+
+      function recalcTotals() {
+        let total = 0,
+          income = 0,
+          expense = 0;
+        transactions.forEach((t) => {
+          const val = parseFloat(t.amount);
+          if (t.type === "income") {
+            income += val;
+            total += val;
+          } else {
+            expense += val;
+            total -= val;
+          }
+        });
+        document.getElementById("balance").innerText = `€${total.toFixed(2)}`;
+        document.getElementById("income").innerText = `€${income.toFixed(2)}`;
+        document.getElementById("expense").innerText = `€${expense.toFixed(2)}`;
+      }
+
+      function saveTransaction() {
+        const dateInput = document.getElementById("date").value;
+        const desc = document.getElementById("desc").value;
+        const amount = document.getElementById("amount").value;
+        const type = document.getElementById("type").value;
+
+        if (!desc || !amount) {
+          alert(translations[currentLang].alertMissing);
+          return;
+        }
+
+        const transactionData = {
+          desc,
+          amount,
+          type,
+          date: dateInput || new Date().toISOString().split("T")[0],
+        };
+
+        if (editIndex >= 0) {
+          transactions[editIndex] = transactionData;
+          editIndex = -1;
+        } else {
+          transactions.push(transactionData);
+        }
+
+        resetForm();
+        updateDOM();
+      }
+
+      function loadForEdit(index) {
+        const t = transactions[index];
+        document.getElementById("desc").value = t.desc;
+        document.getElementById("amount").value = t.amount;
+        document.getElementById("type").value = t.type;
+        document.getElementById("date").value = t.date;
+
+        editIndex = index;
+        document.body.classList.add("editing-mode");
+        document.getElementById("cancel-btn").style.display = "block";
+        document.getElementById("save-btn").innerText =
+          translations[currentLang].btnSave;
+        document
+          .getElementById("form-card")
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      function removeTransaction(index) {
+        if (confirm(translations[currentLang].confirmDelete)) {
+          transactions.splice(index, 1);
+          if (editIndex === index) resetForm();
+          updateDOM();
+        }
+      }
+
+      function resetForm() {
+        document.getElementById("desc").value = "";
+        document.getElementById("amount").value = "";
+        document.getElementById("date").valueAsDate = new Date();
+        document.getElementById("type").value = "expense";
+        editIndex = -1;
+        document.body.classList.remove("editing-mode");
+        document.getElementById("cancel-btn").style.display = "none";
+        document.getElementById("save-btn").innerText =
+          translations[currentLang].btnAdd;
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return "";
+        const [year, month, day] = dateString.split("-");
+        const d = new Date(year, month - 1, day);
+        const locale = currentLang === "it" ? "it-IT" : "en-US";
+        return d.toLocaleDateString(locale, {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+      }
+
+      document.getElementById("date").valueAsDate = new Date();
+      applyLanguage();
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then(() => console.log("App installabile pronta!"));
+      }
+    </script>
+  </body>
+</html>
