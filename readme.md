@@ -3,41 +3,41 @@
 ![Project Status](https://img.shields.io/badge/status-active-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**My Wallet** è una Web App moderna (PWA) progettata per tracciare entrate, uscite e obiettivi di risparmio in modo semplice, veloce e sicuro. Funziona completamente offline e salva i dati direttamente sul tuo dispositivo.
+**My Wallet** is a modern Progressive Web App (PWA) designed to track income, expenses, and savings goals simply, quickly, and securely. It works completely offline and stores data directly on your device using Local Storage.
 
-🔗 **[VAI ALLA DEMO LIVE](https://mywallettrack.netlify.app)**
+🔗 **[VIEW LIVE DEMO](https://mywallettrack.netlify.app)**
 
 ---
 
-## ✨ Funzionalità Principali
+## ✨ Key Features
 
-- **📱 Progressive Web App (PWA):** Installabile su iOS e Android come un'app nativa.
-- **🔒 Privacy First:** Nessun database esterno. I dati rimangono nel `Local Storage` del tuo browser.
-- **📊 Statistiche Visive:** Grafici a ciambella interattivi per analizzare le spese per categoria.
-- **🎯 Gamification:** Imposta un obiettivo (es. "Moto Nuova") e guarda la barra di progresso riempirsi.
-- **🌍 Multi-lingua:** Supporto istantaneo per Italiano 🇮🇹 e Inglese 🇺🇸.
+- **📱 Progressive Web App (PWA):** Installable on iOS and Android just like a native app.
+- **🔒 Privacy First:** No external database or tracking. Your data stays in your browser's `Local Storage`.
+- **📊 Visual Insights:** Interactive doughnut charts to analyze expenses by category.
+- **🎯 Gamification:** Set a savings goal (e.g., "New Motorbike") and watch the progress bar fill up dynamically.
+- **🌍 Multi-language:** Instant switching between English 🇺🇸 and Italian 🇮🇹.
 - **💾 Backup & Export:**
-  - Esporta un file `.json` completo per il backup.
-  - Scarica un file `.csv` compatibile con Excel/Google Sheets.
-  - Ripristina i dati su qualsiasi dispositivo.
-- **🌑 Dark Mode:** Design scuro nativo, moderno e riposante per gli occhi.
+  - Export a full `.json` backup file.
+  - Download a `.csv` file compatible with Excel and Google Sheets.
+  - Restore your data on any device.
+- **🌑 Dark Mode:** Sleek, battery-saving dark interface.
 
 ---
 
-## 🚀 Come Installare
+## 🚀 How to Install
 
-### Su Smartphone (iOS/Android)
+### On Smartphone (iOS/Android)
 
-1.  Apri il [Link dell'App](https://mywallettrack.netlify.app).
-2.  Premi "Condividi" (iOS) o il menu impostazioni (Android).
-3.  Seleziona **"Aggiungi alla Schermata Home"**.
+1.  Open the [Live Link](https://mywallettrack.netlify.app) in your browser (Safari/Chrome).
+2.  Tap the **Share** button (iOS) or the **Menu** dots (Android).
+3.  Select **"Add to Home Screen"**.
 
-### In Locale (Per Sviluppatori)
+### Local Development
 
-Basta clonare la repo e aprire `index.html`:
+Clone the repository and open it in your browser:
 
 ```bash
 git clone [https://github.com/Al3xxDev/WalletApp.git](https://github.com/Al3xxDev/WalletApp.git)
 cd WalletApp
-# Apri index.html col tuo browser preferito
+# Open index.html with your preferred browser
 ```
