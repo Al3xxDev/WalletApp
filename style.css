@@ -28,7 +28,6 @@ body {
   padding-bottom: 80px;
 }
 
-/* ANIMAZIONI */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -62,7 +61,6 @@ body {
   z-index: 100;
   background: rgba(9, 9, 11, 0.85);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   width: 100%;
 }
@@ -80,7 +78,6 @@ h1 {
   font-weight: 600;
   letter-spacing: -0.5px;
 }
-
 .lang-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -90,11 +87,9 @@ h1 {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: "Inter", sans-serif;
 }
 .container {
   max-width: var(--app-width);
@@ -115,10 +110,74 @@ h1 {
   margin-top: 10px;
 }
 
-/* SELECT CUSTOM */
+/* PRIVACY MODE */
+.balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.privacy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 4px;
+  transition: color 0.2s;
+}
+.privacy-btn:hover {
+  color: white;
+}
+body.privacy-active .sensitive-data {
+  filter: blur(12px);
+  user-select: none;
+}
+
+/* NUOVO: Input Fondi (Design Integrato) */
+.funds-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.fund-item {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+}
+.fund-item label {
+  font-size: 10px;
+  opacity: 0.8;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.fund-input {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  width: 100%;
+  outline: none;
+  border-bottom: 1px solid transparent;
+  transition: border 0.2s;
+}
+.fund-input:focus {
+  box-shadow: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0;
+}
+.fund-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
 select {
   appearance: none;
-  -webkit-appearance: none;
   width: 100%;
   background-color: var(--bg-input);
   border: 1px solid transparent;
@@ -129,7 +188,6 @@ select {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   outline: none;
-  transition: all 0.2s ease;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
@@ -138,13 +196,11 @@ select {
 select:focus {
   background-color: var(--bg-body);
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 }
-
 .filter-select {
   appearance: none;
-  background-color: transparent;
+  background: transparent;
   border: none;
   color: var(--accent-color);
   font-size: 13px;
@@ -154,7 +210,6 @@ select:focus {
   padding: 4px 24px 4px 0;
   width: auto;
   text-align: right;
-  font-family: "Inter", sans-serif;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right center;
@@ -165,7 +220,6 @@ select:focus {
   color: white;
   padding: 10px;
 }
-
 input {
   width: 100%;
   background-color: var(--bg-input);
@@ -176,14 +230,18 @@ input {
   font-size: 15px;
   font-family: "Inter", sans-serif;
   outline: none;
-  transition: all 0.2s ease;
-  appearance: none;
-  -webkit-appearance: none;
 }
 input:focus {
   background-color: var(--bg-body);
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* RESET STILE STANDARD INPUT DENTRO LE CARD PER NON ROVINARE */
+.fund-input:focus {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
 .balance-card {
@@ -269,8 +327,6 @@ input:focus {
   color: var(--text-secondary);
   padding: 5px;
 }
-
-/* Barra BLU */
 .progress-track {
   width: 100%;
   height: 12px;
@@ -290,7 +346,6 @@ input:focus {
   background: var(--accent-color);
   box-shadow: 0 0 15px var(--accent-color);
 }
-
 .goal-stats {
   display: flex;
   justify-content: space-between;
@@ -392,6 +447,15 @@ label {
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+.btn-danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+.btn-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+}
 
 .search-wrapper {
   position: relative;
@@ -431,7 +495,6 @@ label {
   padding: 0;
   margin: 0;
 }
-
 .t-item {
   display: flex;
   justify-content: space-between;
@@ -448,7 +511,6 @@ label {
 .t-item:active {
   transform: scale(0.99);
 }
-
 .t-left {
   display: flex;
   flex-direction: column;
@@ -504,7 +566,6 @@ label {
   height: 18px;
   stroke-width: 2;
 }
-
 body.editing-mode .btn-main {
   background-color: var(--success-color);
   color: white;

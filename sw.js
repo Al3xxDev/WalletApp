@@ -1,11 +1,10 @@
-// AGGIORNA VERSIONE: v10 (Così l'utente scarica i nuovi file separati)
-const CACHE_NAME = "wallet-v10";
+const CACHE_NAME = "wallet-v14";
 
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css", // NUOVO
-  "./app.js", // NUOVO
+  "./style.css",
+  "./app.js",
   "./manifest.json",
   "./icon.png",
 ];

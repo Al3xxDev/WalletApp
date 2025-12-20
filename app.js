@@ -31,6 +31,7 @@ const translations = {
     btnBackup: "Backup",
     btnRestore: "Ripristina",
     btnCsv: "Excel",
+    btnReset: "Elimina Tutto",
     alertBackupSuccess: "Backup scaricato con successo!",
     alertRestoreSuccess: "Dati ripristinati correttamente!",
     alertError: "Errore nel file.",
@@ -48,6 +49,7 @@ const translations = {
     pLastMonth: "Mese Scorso",
     p3Months: "Ultimi 3 Mesi",
     pThisYear: "Quest'Anno",
+    confirmReset: "ATTENZIONE: Questo cancellerà TUTTI i dati. Sei sicuro?",
   },
   en: {
     appTitle: "My Wallet",
@@ -81,6 +83,7 @@ const translations = {
     btnBackup: "Backup",
     btnRestore: "Restore",
     btnCsv: "Excel",
+    btnReset: "Reset All",
     alertBackupSuccess: "Backup downloaded!",
     alertRestoreSuccess: "Data restored successfully!",
     alertError: "Invalid file.",
@@ -98,6 +101,7 @@ const translations = {
     pLastMonth: "Last Month",
     p3Months: "Last 3 Months",
     pThisYear: "This Year",
+    confirmReset: "WARNING: This will delete ALL data. Are you sure?",
   },
 };
 
@@ -109,12 +113,38 @@ let savingsGoal = JSON.parse(localStorage.getItem("wallet_goal")) || {
   name: "Risparmio",
   target: 1000,
 };
+// NUOVO: Gestione fondi manuali
+let funds = JSON.parse(localStorage.getItem("wallet_funds")) || {
+  bank: 0,
+  cash: 0,
+};
+
 let editIndex = -1;
 let currentLang = localStorage.getItem("wallet_lang") || "it";
 let expenseChart = null;
 let prevBalance = 0;
 let prevIncome = 0;
 let prevExpense = 0;
+
+function togglePrivacy() {
+  document.body.classList.toggle("privacy-active");
+}
+function resetAllData() {
+  if (confirm(translations[currentLang].confirmReset)) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
+// Salva i valori dei box manuali
+function saveFunds() {
+  const bankVal = parseFloat(document.getElementById("manual-bank").value) || 0;
+  const cashVal = parseFloat(document.getElementById("manual-cash").value) || 0;
+  funds = { bank: bankVal, cash: cashVal };
+  localStorage.setItem("wallet_funds", JSON.stringify(funds));
+  // Ricalcola il totale immediatamente
+  updateDOM();
+}
 
 function animateValue(id, start, end, duration) {
   const obj = document.getElementById(id);
@@ -191,14 +221,21 @@ function updateGoalUI(currentBalance) {
 
 function calculateCurrentBalance() {
   let total = 0;
+  // Somma transazioni
   transactions.forEach((t) => {
     total += t.type === "income" ? parseFloat(t.amount) : -parseFloat(t.amount);
   });
+  // Somma fondi manuali
+  total += funds.bank + funds.cash;
   return total;
 }
 
 function exportData() {
-  const exportObj = { transactions: transactions, goal: savingsGoal };
+  const exportObj = {
+    transactions: transactions,
+    goal: savingsGoal,
+    funds: funds,
+  }; // Include i fondi
   const dataStr = JSON.stringify(exportObj, null, 2);
   const linkElement = document.createElement("a");
   linkElement.setAttribute(
@@ -249,6 +286,10 @@ function importData(event) {
         if (imported.goal) {
           savingsGoal = imported.goal;
           localStorage.setItem("wallet_goal", JSON.stringify(savingsGoal));
+        }
+        if (imported.funds) {
+          funds = imported.funds;
+          localStorage.setItem("wallet_funds", JSON.stringify(funds));
         }
       }
       localStorage.setItem("transactions", JSON.stringify(transactions));
@@ -363,6 +404,11 @@ function applyLanguage() {
   if (savingsGoal.name === "Risparmio" || savingsGoal.name === "Savings") {
     savingsGoal.name = currentLang === "it" ? "Risparmio" : "Savings";
   }
+
+  // Ricarica valori fondi
+  document.getElementById("manual-bank").value = funds.bank || "";
+  document.getElementById("manual-cash").value = funds.cash || "";
+
   updateDOM();
 }
 function toggleLanguage() {
@@ -434,7 +480,7 @@ function updateDOM() {
                     <span class="t-date">${formatDate(t.date)}</span>
                 </div>
                 <div class="t-right">
-                    <span class="t-amount" style="color: ${
+                    <span class="t-amount sensitive-data" style="color: ${
                       isIncome ? "var(--success-color)" : "var(--danger-color)"
                     }">
                         ${isIncome ? "+" : "-"}€${val.toFixed(2)}
@@ -469,7 +515,10 @@ function recalcStats(filteredList) {
       expense += val;
     }
   });
+
+  // CALCOLO TOTALE: Fondi Manuali + Risultato Transazioni
   const totalBalance = calculateCurrentBalance();
+
   animateValue("balance", prevBalance, totalBalance, 800);
   animateValue("income", prevIncome, income, 800);
   animateValue("expense", prevExpense, expense, 800);
